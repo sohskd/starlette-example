@@ -1,9 +1,8 @@
 from starlette.applications import Starlette
 from starlette.staticfiles import StaticFiles
-from starlette.responses import HTMLResponse
+from starlette.websockets import WebSocket
 from starlette.templating import Jinja2Templates
 import uvicorn
-
 
 templates = Jinja2Templates(directory='templates')
 
@@ -44,6 +43,13 @@ async def server_error(request, exc):
     template = "500.html"
     context = {"request": request}
     return templates.TemplateResponse(template, context, status_code=500)
+
+
+async def app(scope, receive, send):
+    websocket = WebSocket(scope=scope, receive=receive, send=send)
+    await websocket.accept()
+    await websocket.send_text('Hello, world!')
+    await websocket.close()
 
 
 if __name__ == "__main__":
